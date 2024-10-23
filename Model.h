@@ -2,11 +2,11 @@
 
 #include "pch.h"
 
-struct Model {
+class Model {
 protected:
 
 public:
-	Model(std::string dirPath, std::string fileNameWithoutExtension);
+	Model(const std::string& dirPath, const std::string& fileNameWithoutExtension);
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::unordered_map<float, sf::Vector3f> colorMap;

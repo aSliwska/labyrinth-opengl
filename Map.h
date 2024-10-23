@@ -2,8 +2,7 @@
 
 #include "pch.h"
 
-struct Map
-{
+class Map {
 public:
     enum Tile { air, ground, bush, flag };
 
@@ -17,7 +16,7 @@ protected:
 public:
     Map(sf::Vector2u startPosition, sf::Vector2u endPosition, std::vector<std::vector<Tile>> tiles);
 
-    static Map* loadMap(std::string filePath);
+    static Map* loadMap(const std::string& filePath);
 
     static bool isWalkable(Tile tile);
     std::vector<std::vector<Tile>> getTiles();

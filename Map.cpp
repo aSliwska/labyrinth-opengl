@@ -20,7 +20,7 @@ std::vector<std::string> Map::split(const std::string& s, char delim) {
     return result;
 }
 
-Map* Map::loadMap(std::string filePath) {
+Map* Map::loadMap(const std::string& filePath) {
     sf::Vector2u startPosition;
     sf::Vector2u endPosition;
     std::vector<std::vector<Map::Tile>> tiles;

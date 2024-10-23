@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "Model.h"
 
-Model::Model(std::string dirPath, std::string fileNameWithoutExtension)
+Model::Model(const std::string& dirPath, const std::string& fileNameWithoutExtension)
 {
 	// read vertices
 	std::string inputFileWithoutExtension = dirPath + "/" + fileNameWithoutExtension;

@@ -2,13 +2,37 @@
 
 #include "pch.h"
 
-struct Spherical
-{
-public:
+class Spherical {
+protected:
     float distance, theta, phi;
 
-    Spherical(float gdistance, float gtheta, float gphi);
-    float getX();
-    float getY();
-    float getZ();
+public:
+    Spherical();
+    Spherical(float distance, float theta, float phi);
+
+    float getDistance();
+    float getTheta();
+    float getPhi();
+    virtual float getX();
+    virtual float getY();
+    virtual float getZ();
+};
+
+class UnlockedSpherical : public Spherical {
+public:
+    UnlockedSpherical(float distance, float theta, float phi);
+
+    void setTheta(float theta);
+};
+
+class LockedSpherical : public Spherical {
+protected:
+    float x, y, z;
+
+public:
+    LockedSpherical(float distance, float theta, float phi);
+
+    float getX() override;
+    float getY() override;
+    float getZ() override;
 };

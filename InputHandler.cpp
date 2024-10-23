@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "InputHandler.h"
 
-InputHandler::InputHandler(Spherical* camera, sf::Vector3f* position, Spherical* rotation, float walkSpeed, float cameraSpeed, float tileSize, Map* map, float characterRadius)
+InputHandler::InputHandler(LockedSpherical* camera, sf::Vector3f* position, UnlockedSpherical* rotation, float walkSpeed, float tileSize, Map* map, float characterRadius)
 {
     aPressed = wPressed = sPressed = dPressed = false;
     modelForwardRotation = 90;
@@ -11,7 +11,6 @@ InputHandler::InputHandler(Spherical* camera, sf::Vector3f* position, Spherical*
     this->position = position;
     this->rotation = rotation;
     this->walkSpeed = walkSpeed;
-    this->cameraSpeed = cameraSpeed;
     this->tileSize = tileSize;
     this->map = map;
     this->characterRadius = characterRadius;
@@ -41,14 +40,14 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
 
         if (forward != 0) 
         {
-            distanceWalkedX -= (camera->getX() / camera->distance) * forward * curWalkSpeed / time;
-            distanceWalkedZ -= (camera->getZ() / camera->distance) * forward * curWalkSpeed / time;
+            distanceWalkedX -= (camera->getX() / camera->getDistance()) * forward * curWalkSpeed / time;
+            distanceWalkedZ -= (camera->getZ() / camera->getDistance()) * forward * curWalkSpeed / time;
         }
 
         if (right != 0)
         {
-            distanceWalkedX -= (camera->getZ() / camera->distance) * right * curWalkSpeed / time;
-            distanceWalkedZ -= (-camera->getX() / camera->distance) * right * curWalkSpeed / time;
+            distanceWalkedX -= (camera->getZ() / camera->getDistance()) * right * curWalkSpeed / time;
+            distanceWalkedZ -= (-camera->getX() / camera->getDistance()) * right * curWalkSpeed / time;
         }
 
         int oldMapCoordX = std::floor(position->x / tileSize);
@@ -103,7 +102,7 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
             }
         }
 
-        rotation->theta = -radiansToDegreesConstant * camera->theta - modelForwardRotation + ((forward == -1) ? 180 : 0) + right * ((forward != 0) ? 45*forward : 90);
+        rotation->setTheta(-radiansToDegreesConstant * camera->getTheta() - modelForwardRotation + ((forward == -1) ? 180 : 0) + right * ((forward != 0) ? 45 * forward : 90));
     }
 }
 

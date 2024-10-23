@@ -4,18 +4,19 @@
 #include "Spherical.h"
 #include "Map.h"
 
-struct InputHandler {
+class InputHandler {
 protected:
     bool aPressed, wPressed, sPressed, dPressed;
     float modelForwardRotation, radiansToDegreesConstant;
 
-    Spherical* camera, * rotation;
+    LockedSpherical* camera;
+    UnlockedSpherical *rotation;
     sf::Vector3f* position;
     Map* map;
-    float walkSpeed, cameraSpeed, tileSize, characterRadius;
+    float walkSpeed, tileSize, characterRadius;
 
 public:
-    InputHandler(Spherical* camera, sf::Vector3f* position, Spherical* rotation, float walkSpeed, float cameraSpeed, float tileSize, Map* map, float characterRadius);
+    InputHandler(LockedSpherical* camera, sf::Vector3f* position, UnlockedSpherical* rotation, float walkSpeed, float tileSize, Map* map, float characterRadius);
 
     void handleUserInput(sf::Time timeElapsed);
 
