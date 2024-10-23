@@ -1,22 +1,22 @@
 #include "pch.h"
 #include "InputHandler.h"
 
-InputHandler::InputHandler(LockedSpherical* camera, sf::Vector3f* position, UnlockedSpherical* rotation, float walkSpeed, float tileSize, Map* map, float characterRadius)
+InputHandler::InputHandler(const std::shared_ptr<LockedSpherical>& camera, const std::shared_ptr<sf::Vector3f>& playerPosition, const std::shared_ptr<UnlockedSpherical>& playerRotation, float walkSpeed, float tileSize, const std::shared_ptr<Map>& map, float characterRadius)
 {
     aPressed = wPressed = sPressed = dPressed = false;
     modelForwardRotation = 90;
     radiansToDegreesConstant = 57.29577;
 
     this->camera = camera;
-    this->position = position;
-    this->rotation = rotation;
+    this->playerPosition = playerPosition;
+    this->playerRotation = playerRotation;
     this->walkSpeed = walkSpeed;
     this->tileSize = tileSize;
     this->map = map;
     this->characterRadius = characterRadius;
 }
 
-void InputHandler::handleUserInput(sf::Time timeElapsed)
+void InputHandler::handleUserInput(const sf::Time& timeElapsed)
 {
     float time = timeElapsed.asMilliseconds();
 
@@ -50,14 +50,14 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
             distanceWalkedZ -= (-camera->getX() / camera->getDistance()) * right * curWalkSpeed / time;
         }
 
-        int oldMapCoordX = std::floor(position->x / tileSize);
-        int oldMapCoordZ = std::floor(position->z / tileSize);
+        int oldMapCoordX = std::floor(playerPosition->x / tileSize);
+        int oldMapCoordZ = std::floor(playerPosition->z / tileSize);
 
         int walkDirectionXSign = (distanceWalkedX < 0) ? -1 : ((distanceWalkedX > 0) ? 1 : 0);
         int walkDirectionZSign = (distanceWalkedZ < 0) ? -1 : ((distanceWalkedZ > 0) ? 1 : 0);
 
-        float newPositionToCheckX = position->x + distanceWalkedX + walkDirectionXSign * characterRadius;
-        float newPositionToCheckZ = position->z + distanceWalkedZ + walkDirectionZSign * characterRadius;
+        float newPositionToCheckX = playerPosition->x + distanceWalkedX + walkDirectionXSign * characterRadius;
+        float newPositionToCheckZ = playerPosition->z + distanceWalkedZ + walkDirectionZSign * characterRadius;
 
         int newMapCoordToCheckX = std::floor(newPositionToCheckX / tileSize);
         int newMapCoordToCheckZ = std::floor(newPositionToCheckZ / tileSize);
@@ -69,8 +69,8 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
              Map::isWalkable(map->getTiles()[oldMapCoordZ][newMapCoordToCheckX]))
         ) 
         {
-            position->x += distanceWalkedX;
-            position->z += distanceWalkedZ;
+            playerPosition->x += distanceWalkedX;
+            playerPosition->z += distanceWalkedZ;
         }
         else 
         {
@@ -80,7 +80,7 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
 
             while (distanceWalkedX * walkDirectionXSign > 0) {
                 if (Map::isWalkable(map->getTiles()[newMapCoordToCheckZ][mapCoordToCheckX]) && Map::isWalkable(map->getTiles()[oldMapCoordZ][mapCoordToCheckX])) {
-                    position->x += distanceWalkedX;
+                    playerPosition->x += distanceWalkedX;
                     break;
                 }
                 distanceWalkedX -= rayStep;
@@ -93,7 +93,7 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
 
             while (distanceWalkedZ * walkDirectionZSign > 0) {
                 if (Map::isWalkable(map->getTiles()[mapCoordToCheckZ][newMapCoordToCheckX]) && Map::isWalkable(map->getTiles()[mapCoordToCheckZ][oldMapCoordX])) {
-                    position->z += distanceWalkedZ;
+                    playerPosition->z += distanceWalkedZ;
                     break;
                 }
                 distanceWalkedZ -= rayStep;
@@ -102,7 +102,7 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
             }
         }
 
-        rotation->setTheta(-radiansToDegreesConstant * camera->getTheta() - modelForwardRotation + ((forward == -1) ? 180 : 0) + right * ((forward != 0) ? 45 * forward : 90));
+        playerRotation->setTheta(-radiansToDegreesConstant * camera->getTheta() - modelForwardRotation + ((forward == -1) ? 180 : 0) + right * ((forward != 0) ? 45 * forward : 90));
     }
 }
 

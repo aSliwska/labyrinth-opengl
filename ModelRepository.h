@@ -6,10 +6,8 @@
 
 class ModelRepository {
 public:
-    Model* bush, * character, * ground, * flag;
+    std::unique_ptr<Model> bush, character, ground, flag;
 
-    ModelRepository();
+    ModelRepository() {}
     ModelRepository(const std::string& modelDirectory, float tileSize);
-
-    ~ModelRepository();
 };

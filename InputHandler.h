@@ -9,16 +9,16 @@ protected:
     bool aPressed, wPressed, sPressed, dPressed;
     float modelForwardRotation, radiansToDegreesConstant;
 
-    LockedSpherical* camera;
-    UnlockedSpherical *rotation;
-    sf::Vector3f* position;
-    Map* map;
+    std::shared_ptr<LockedSpherical> camera;
+    std::shared_ptr<UnlockedSpherical> playerRotation;
+    std::shared_ptr<sf::Vector3f> playerPosition;
+    std::shared_ptr<Map> map;
     float walkSpeed, tileSize, characterRadius;
 
 public:
-    InputHandler(LockedSpherical* camera, sf::Vector3f* position, UnlockedSpherical* rotation, float walkSpeed, float tileSize, Map* map, float characterRadius);
+    InputHandler(const std::shared_ptr<LockedSpherical>& camera, const std::shared_ptr<sf::Vector3f>& playerPosition, const std::shared_ptr<UnlockedSpherical>& playerRotation, float walkSpeed, float tileSize, const std::shared_ptr<Map>& map, float characterRadius);
 
-    void handleUserInput(sf::Time timeElapsed);
+    void handleUserInput(const sf::Time& timeElapsed);
 
     bool isAPressed();
     bool isWPressed();

@@ -16,7 +16,7 @@ protected:
 public:
     Map(sf::Vector2u startPosition, sf::Vector2u endPosition, std::vector<std::vector<Tile>> tiles);
 
-    static Map* loadMap(const std::string& filePath);
+    static std::shared_ptr<Map> loadMap(const std::string& filePath);
 
     static bool isWalkable(Tile tile);
     std::vector<std::vector<Tile>> getTiles();

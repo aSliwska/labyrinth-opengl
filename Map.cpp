@@ -20,7 +20,7 @@ std::vector<std::string> Map::split(const std::string& s, char delim) {
     return result;
 }
 
-Map* Map::loadMap(const std::string& filePath) {
+std::shared_ptr<Map> Map::loadMap(const std::string& filePath) {
     sf::Vector2u startPosition;
     sf::Vector2u endPosition;
     std::vector<std::vector<Map::Tile>> tiles;
@@ -76,7 +76,7 @@ Map* Map::loadMap(const std::string& filePath) {
         }
     }
 
-    return new Map(startPosition, endPosition, tiles);
+    return std::shared_ptr<Map>(new Map(startPosition, endPosition, tiles));
 }
 
 bool Map::isWalkable(Tile tile)

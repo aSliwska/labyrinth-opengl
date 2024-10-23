@@ -14,6 +14,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <limits>
+#include <memory>
 
 #include "tiny_obj_loader.h"
 #include "imgui.h" 

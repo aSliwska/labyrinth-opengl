@@ -9,17 +9,17 @@
 
 class Game {
 protected:
-	LockedSpherical* camera;
-	UnlockedSpherical* playerRotation;
-	sf::Vector3f playerPosition;
+	std::shared_ptr<LockedSpherical> camera;
+	std::shared_ptr<UnlockedSpherical> playerRotation;
+	std::shared_ptr<sf::Vector3f> playerPosition;
 	float tileSize = 1.6;
-	ModelRepository* modelRepo;
-	Map* map;
-	InputHandler* inputHandler;
+	std::unique_ptr<ModelRepository> modelRepo;
+	std::shared_ptr<Map> map;
+	std::unique_ptr<InputHandler> inputHandler;
 
 	void initOpenGL();
 	void reshapeScreen(const sf::Vector2u& size);
-	void drawModel(Model* model, float x, float y, float z);
+	void drawModel(const std::unique_ptr<Model>& model, float x, float y, float z);
 	void drawScene();
 	bool checkWinCondition();
 
@@ -27,12 +27,4 @@ public:
 	Game();
 
 	void run();
-
-	~Game() {
-		delete camera;
-		delete playerRotation;
-		delete modelRepo;
-		delete map;
-		delete inputHandler;
-	}
 };

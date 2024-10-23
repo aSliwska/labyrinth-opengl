@@ -4,16 +4,16 @@
 Game::Game()
 {
     float walkSpeed = 1.5f;
-    camera = new LockedSpherical(12.0f, 0.785398f, 0.7f);
-    playerRotation = new UnlockedSpherical(1.0f, 0.9f, 0.0f);
+    camera = std::shared_ptr<LockedSpherical>(new LockedSpherical(12.0f, 0.785398f, 0.7f));
+    playerRotation = std::shared_ptr<UnlockedSpherical>(new UnlockedSpherical(1.0f, 0.9f, 0.0f));
     tileSize = 1.6;
-    modelRepo = new ModelRepository("resources/models", tileSize);
+    modelRepo = std::unique_ptr<ModelRepository>(new ModelRepository("resources/models", tileSize));
     map = Map::loadMap("resources/test1.txt");
 
     float characterRadius = std::min(modelRepo->character->xMax - modelRepo->character->xMin, modelRepo->character->zMax - modelRepo->character->zMin) / 2;
-    playerPosition = sf::Vector3f(((float)map->getStartX() + 0.5) * tileSize, 0.0f, ((float)map->getStartZ() - 0.5) * tileSize);
+    playerPosition = std::shared_ptr<sf::Vector3f>(new sf::Vector3f(((float)map->getStartX() + 0.5) * tileSize, 0.0f, ((float)map->getStartZ() - 0.5) * tileSize));
 
-    inputHandler = new InputHandler(camera, &playerPosition, playerRotation, walkSpeed, tileSize, map, characterRadius);
+    inputHandler = std::unique_ptr<InputHandler>(new InputHandler(camera, playerPosition, playerRotation, walkSpeed, tileSize, map, characterRadius));
 
     /*sf::Shader shader;
     if (!shader.loadFromFile("resources/shaders/instancer.vert", sf::Shader::Vertex)) {
@@ -149,7 +149,7 @@ void Game::reshapeScreen(const sf::Vector2u& size)
     glLoadIdentity();
 }
 
-void Game::drawModel(Model* model, float x, float y, float z)
+void Game::drawModel(const std::unique_ptr<Model>& model, float x, float y, float z)
 {
     glPushMatrix();
     glTranslatef(x + model->xOffset, y + model->yOffset, z + model->zOffset);
@@ -215,7 +215,7 @@ void Game::drawScene()
     glPopMatrix();
 
     // move the world
-    glTranslatef(-playerPosition.x, -playerPosition.y, -playerPosition.z);
+    glTranslatef(-playerPosition->x, -playerPosition->y, -playerPosition->z);
 
     float z = 0;
     for (std::vector<Map::Tile> row : map->getTiles())
@@ -242,5 +242,5 @@ void Game::drawScene()
 
 bool Game::checkWinCondition()
 {
-    return (*map).getTiles()[std::floor(playerPosition.z / tileSize)][std::floor(playerPosition.x / tileSize)] == Map::Tile::flag;
+    return (*map).getTiles()[std::floor(playerPosition->z / tileSize)][std::floor(playerPosition->x / tileSize)] == Map::Tile::flag;
 }
