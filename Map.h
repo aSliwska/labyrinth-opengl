@@ -19,7 +19,7 @@ public:
 
     static Map* loadMap(std::string filePath);
 
-    bool isBush(unsigned int x, unsigned int z);
+    static bool isWalkable(Tile tile);
     std::vector<std::vector<Tile>> getTiles();
     unsigned int getStartX();
     unsigned int getStartZ();

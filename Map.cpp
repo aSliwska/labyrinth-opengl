@@ -79,9 +79,9 @@ Map* Map::loadMap(std::string filePath) {
     return new Map(startPosition, endPosition, tiles);
 }
 
-bool Map::isBush(unsigned int x, unsigned int z) 
+bool Map::isWalkable(Tile tile)
 {
-    return tiles.at(z).at(x);
+    return (tile == Map::Tile::ground) || (tile == Map::Tile::flag);
 }
 
 std::vector<std::vector<Map::Tile>> Map::getTiles() 

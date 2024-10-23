@@ -65,9 +65,9 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
 
         // this many checks so character doesn't clip through corners
         if (((oldMapCoordX == newMapCoordToCheckX) && (oldMapCoordZ == newMapCoordToCheckZ)) ||
-            (map->getTiles()[newMapCoordToCheckZ][newMapCoordToCheckX] == Map::Tile::ground &&
-            map->getTiles()[newMapCoordToCheckZ][oldMapCoordX] == Map::Tile::ground &&
-            map->getTiles()[oldMapCoordZ][newMapCoordToCheckX] == Map::Tile::ground)
+            (Map::isWalkable(map->getTiles()[newMapCoordToCheckZ][newMapCoordToCheckX]) &&
+             Map::isWalkable(map->getTiles()[newMapCoordToCheckZ][oldMapCoordX]) &&
+             Map::isWalkable(map->getTiles()[oldMapCoordZ][newMapCoordToCheckX]))
         ) 
         {
             position->x += distanceWalkedX;
@@ -80,7 +80,7 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
             float rayStep = walkDirectionXSign * 0.001;
 
             while (distanceWalkedX * walkDirectionXSign > 0) {
-                if (map->getTiles()[newMapCoordToCheckZ][mapCoordToCheckX] == Map::Tile::ground && map->getTiles()[oldMapCoordZ][mapCoordToCheckX] == Map::Tile::ground) {
+                if (Map::isWalkable(map->getTiles()[newMapCoordToCheckZ][mapCoordToCheckX]) && Map::isWalkable(map->getTiles()[oldMapCoordZ][mapCoordToCheckX])) {
                     position->x += distanceWalkedX;
                     break;
                 }
@@ -93,7 +93,7 @@ void InputHandler::handleUserInput(sf::Time timeElapsed)
             rayStep = walkDirectionZSign * 0.001;
 
             while (distanceWalkedZ * walkDirectionZSign > 0) {
-                if (map->getTiles()[mapCoordToCheckZ][newMapCoordToCheckX] == Map::Tile::ground && map->getTiles()[mapCoordToCheckZ][oldMapCoordX] == Map::Tile::ground) {
+                if (Map::isWalkable(map->getTiles()[mapCoordToCheckZ][newMapCoordToCheckX]) && Map::isWalkable(map->getTiles()[mapCoordToCheckZ][oldMapCoordX])) {
                     position->z += distanceWalkedZ;
                     break;
                 }

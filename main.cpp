@@ -159,6 +159,10 @@ void drawScene(Map* map, Model* bushModel, Model* characterModel, Model* groundM
     glFlush();
 }
 
+bool checkWinCondition(Map* map) {
+    return map->getTiles()[std::floor(PLAYER_POSITION.z / TILE_SIZE)][std::floor(PLAYER_POSITION.x / TILE_SIZE)] == Map::Tile::flag;
+}
+
 int main()
 {
     bool running = true;
@@ -249,8 +253,13 @@ int main()
         reshapeScreen(window.getSize());
 
         drawScene(map, bushModel, characterModel, groundModel, flagModel);
+
         inputHandler.handleUserInput(deltaClock.getElapsedTime());
-        //std::cout << deltaClock.getElapsedTime().asMilliseconds() << std::endl;
+        if (checkWinCondition(map)) {
+            std::cout << "\nYou won!\n" << std::endl;
+            running = false;
+        }
+        std::cout << deltaClock.getElapsedTime().asMilliseconds() << std::endl;
         ImGui::SFML::Update(window, deltaClock.restart());
 
         ImGui::SFML::Render(window);
