@@ -6,25 +6,26 @@
 
 struct InputHandler {
 protected:
-    bool aPressed, wPressed, sPressed, dPressed, leftPressed, rightPressed;
+    bool aPressed, wPressed, sPressed, dPressed;
     float modelForwardRotation, radiansToDegreesConstant;
 
-public:
-    InputHandler();
+    Spherical* camera, * rotation;
+    sf::Vector3f* position;
+    Map* map;
+    float walkSpeed, cameraSpeed, tileSize, characterRadius;
 
-    void handleUserInput(Spherical* camera, sf::Vector3f* position, Spherical* rotation, sf::Time timeElapsed, float walkSpeed, float cameraSpeed, float tileSize, Map* map, float characterRadius);
+public:
+    InputHandler(Spherical* camera, sf::Vector3f* position, Spherical* rotation, float walkSpeed, float cameraSpeed, float tileSize, Map* map, float characterRadius);
+
+    void handleUserInput(sf::Time timeElapsed);
 
     bool isAPressed();
     bool isWPressed();
     bool isSPressed();
     bool isDPressed();
-    bool isLeftPressed();
-    bool isRightPressed();
 
     void setAPressed(bool state);
     void setWPressed(bool state);
     void setSPressed(bool state);
     void setDPressed(bool state);
-    void setLeftPressed(bool state);
-    void setRightPressed(bool state);
 };

@@ -4,7 +4,7 @@
 typedef sf::Event sfe;
 typedef sf::Keyboard sfk;
 
-Spherical CAMERA(10.0f, 0.79f, 0.7f);
+Spherical CAMERA(12.0f, 0.785398f, 0.7f);
 Spherical PLAYER_ROTATION(1.0f, 0.9f, 0.0f);
 sf::Vector3f PLAYER_POSITION(0.0f, 0.0f, 0.0f);
 
@@ -110,7 +110,7 @@ void drawModel(Model* model, float x, float y, float z)
     glPopMatrix();
 }
 
-void drawScene(Map* map, Model* bushModel, Model* characterModel, Model* groundModel)
+void drawScene(Map* map, Model* bushModel, Model* characterModel, Model* groundModel, Model* flagModel)
 {
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
@@ -148,6 +148,8 @@ void drawScene(Map* map, Model* bushModel, Model* characterModel, Model* groundM
 
             if (tile == Map::Tile::bush) 
                 drawModel(bushModel, x, 0, z);
+            if (tile == Map::Tile::flag)
+                drawModel(flagModel, x, 0, z);
 
             x += TILE_SIZE;
         }
@@ -169,11 +171,13 @@ int main()
     characterModel->setOffset(-characterModel->xMin - (characterModel->xMax - characterModel->xMiddle), -characterModel->yMin, -characterModel->zMin - (characterModel->zMax - characterModel->zMiddle));
     Model* groundModel = new Model("resources/models", "flat_ground");
     groundModel->setOffset(-groundModel->xMin, -groundModel->yMin - groundModel->yMax, -groundModel->zMin);
+    Model* flagModel = new Model("resources/models", "flag");
+    flagModel->setOffset(-flagModel->xMin + TILE_SIZE / 2 - (flagModel->xMiddle - flagModel->xMin), -flagModel->yMin, -flagModel->zMin + TILE_SIZE / 2 - (flagModel->zMiddle - flagModel->zMin));
 
     float characterRadius = std::min(characterModel->xMax - characterModel->xMin, characterModel->zMax - characterModel->zMin) / 2;
 
     Map* map = Map::loadMap("resources/test1.txt");
-    InputHandler inputHandler = InputHandler();
+    InputHandler inputHandler = InputHandler(&CAMERA, &PLAYER_POSITION, &PLAYER_ROTATION, walkSpeed, cameraSpeed, TILE_SIZE, map, characterRadius);
     PLAYER_POSITION.x = ((int)map->getStartX() + 0.5) * TILE_SIZE ;
     PLAYER_POSITION.z = ((int)map->getStartZ() - 0.5) * TILE_SIZE;
 
@@ -218,12 +222,6 @@ int main()
                 if (event.key.code == sfk::D) {
                     inputHandler.setDPressed(true);
                 }
-                if (event.key.code == sfk::Left) {
-                    inputHandler.setLeftPressed(true);
-                }
-                if (event.key.code == sfk::Right) {
-                    inputHandler.setRightPressed(true);
-                }
             }
 
             if (event.type == sfe::KeyReleased)
@@ -240,12 +238,6 @@ int main()
                 if (event.key.code == sfk::D) {
                     inputHandler.setDPressed(false);
                 }
-                if (event.key.code == sfk::Left) {
-                    inputHandler.setLeftPressed(false);
-                }
-                if (event.key.code == sfk::Right) {
-                    inputHandler.setRightPressed(false);
-                }
             }
 
             if (event.type == sfe::Resized) 
@@ -256,20 +248,10 @@ int main()
 
         reshapeScreen(window.getSize());
 
-        drawScene(map, bushModel, characterModel, groundModel);
-        inputHandler.handleUserInput(&CAMERA, &PLAYER_POSITION, &PLAYER_ROTATION, deltaClock.getElapsedTime(), walkSpeed, cameraSpeed, TILE_SIZE, map, characterRadius);
+        drawScene(map, bushModel, characterModel, groundModel, flagModel);
+        inputHandler.handleUserInput(deltaClock.getElapsedTime());
         //std::cout << deltaClock.getElapsedTime().asMilliseconds() << std::endl;
         ImGui::SFML::Update(window, deltaClock.restart());
-
-        ImGui::Begin("Camera");
-        ImGui::SliderFloat("R", &CAMERA.distance, 0.5f, 100.0f);
-        ImGui::SliderAngle("theta", &CAMERA.theta, 0.0f, 360.0f);
-        ImGui::SliderAngle("phi", &CAMERA.phi, -90.0f, 90.0f);
-        ImGui::End();
-
-        ImGui::Begin("Character");
-        ImGui::SliderFloat3("Position", (float*) & PLAYER_POSITION, -10.0f, 10.0f);
-        ImGui::End();
 
         ImGui::SFML::Render(window);
         window.display();
