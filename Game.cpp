@@ -34,17 +34,17 @@ void Game::loadShaders()
     GLuint VBO;
     glGenBuffers(1, &VBO);
 
-    GLuint VBOOffset = 0;
-    modelRepo->character->setVBOOffset(VBOOffset);
+    GLuint vboOffset = 0;
+    modelRepo->character->setVBOOffset(vboOffset);
 
-    VBOOffset += modelRepo->character->getVerticesSize();
-    modelRepo->bush->setVBOOffset(VBOOffset);
+    vboOffset += modelRepo->character->getVerticesSize();
+    modelRepo->bush->setVBOOffset(vboOffset);
 
-    VBOOffset += modelRepo->bush->getVerticesSize();
-    modelRepo->ground->setVBOOffset(VBOOffset);
+    vboOffset += modelRepo->bush->getVerticesSize();
+    modelRepo->ground->setVBOOffset(vboOffset);
 
-    VBOOffset += modelRepo->ground->getVerticesSize();
-    modelRepo->flag->setVBOOffset(VBOOffset);
+    vboOffset += modelRepo->ground->getVerticesSize();
+    modelRepo->flag->setVBOOffset(vboOffset);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -71,6 +71,7 @@ void Game::loadShaders()
     shader.setUniform("lightCoords", sf::Vector3f(3.07107f, 3.64842f, 2.44218f));
     shader.setUniform("ambientColor", sf::Vector3f(1.5f, 1.7f, 5.0f));
     shader.setUniform("diffuseColor", sf::Vector3f(5.0f, 5.3f, 25.0f));
+    shader.setUniform("bgColor", sf::Vector3f(bgColor[0] / 256.0, bgColor[1] / 256.0, bgColor[2] / 256.0));
 }
 
 void Game::run() 
@@ -78,7 +79,7 @@ void Game::run()
     bool isRunning = true;
 
     sf::RenderWindow window(sf::VideoMode(1180, 820), "Labyrinth", 7U, sf::ContextSettings(24, 0, 8, 4, 5));
-    sf::Clock deltaClock;
+    sf::Clock deltaClock, renderClock;
 
     ImGui::SFML::Init(window);
 
@@ -144,7 +145,7 @@ void Game::run()
 
         reshapeScreen(window.getSize());
 
-        drawScene();
+        drawScene(renderClock);
 
         inputHandler->handleUserInput(deltaClock.getElapsedTime());
 
@@ -166,7 +167,7 @@ void Game::run()
 
 void Game::initOpenGL()
 {
-    float bgColor[] = { 22, 25, 51 };
+    bgColor.insert(bgColor.end(), { 22, 25, 51 });
     glClearColor(bgColor[0] / 256.0, bgColor[1] / 256.0, bgColor[2] / 256.0, 0.0f);
 
     glCullFace(GL_BACK);
@@ -189,13 +190,21 @@ void Game::drawModel(const std::unique_ptr<Model>& model, float x, float y, floa
     glDrawArrays(GL_TRIANGLES, model->VBOOffset / vaoVertexSize, model->getVerticesSize() / vaoVertexSize);
 }
 
-void Game::drawScene()
+void Game::drawScene(sf::Clock& renderClock)
 {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     sf::Shader::bind(&shader); // this is an equivalent of glUseProgram and yes, it has to be bound every loop
+
+    // calc elapsed time
+    elapsedRenderTime = (elapsedRenderTime + renderClock.getElapsedTime().asSeconds());
+    renderClock.restart();
+    while (elapsedRenderTime > (43.99315f)) {
+        elapsedRenderTime -= (43.99315f);
+    }
+    shader.setUniform("time", elapsedRenderTime);
 
     // calculate new camera position
     glm::mat4 viewProjection = glm::lookAt(
@@ -208,11 +217,13 @@ void Game::drawScene()
 
     // draw the player
     glm::mat4 modelTransform = glm::rotate(glm::mat4(1.0), glm::radians(playerRotation->getTheta()), glm::vec3(0, 1, 0));
+    shader.setUniform("rotation", sf::Glsl::Mat4(glm::value_ptr(modelTransform)));
     drawModel(modelRepo->character, 0, 0, 0, modelTransform, orthogonalViewTransform);
 
     // move the world
     orthogonalViewTransform = glm::translate(orthogonalViewTransform, glm::vec3(-playerPosition->x, -playerPosition->y, -playerPosition->z));
     shader.setUniform("viewProjection", sf::Glsl::Mat4(glm::value_ptr(orthogonalViewTransform)));
+    shader.setUniform("rotation", sf::Glsl::Mat4(glm::value_ptr(glm::mat4(1.0))));
 
     // draw the world
     float z = 0;
@@ -242,5 +253,3 @@ bool Game::checkWinCondition()
 {
     return (*map).getTiles()[std::floor(playerPosition->z / tileSize)][std::floor(playerPosition->x / tileSize)] == Map::Tile::flag;
 }
-
-// TODO: IBO, instancing, pretty fragment shader with light circle

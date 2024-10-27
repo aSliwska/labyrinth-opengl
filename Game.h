@@ -20,12 +20,14 @@ protected:
 	std::vector<float> mergedVertices;
 	sf::Shader shader;
 	GLuint vaoVertexSize;
+	std::vector<float> bgColor;
+	float elapsedRenderTime;
 
 	void initOpenGL();
 	void loadShaders();
 	void reshapeScreen(const sf::Vector2u& size);
 	void drawModel(const std::unique_ptr<Model>& model, float x, float y, float z, glm::mat4 modelTransform, const glm::mat4& orthogonalViewTransform);
-	void drawScene();
+	void drawScene(sf::Clock& renderClock);
 	bool checkWinCondition();
 
 public:

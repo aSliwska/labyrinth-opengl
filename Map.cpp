@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "Map.h"
 
-Map::Map(sf::Vector2u startPosition, sf::Vector2u endPosition, std::vector<std::vector<Map::Tile>> tiles) 
+Map::Map(sf::Vector2u startPosition, std::vector<std::vector<Map::Tile>> tiles) 
 {
     this->startPosition = startPosition;
-    this->endPosition = endPosition;
     this->tiles = tiles;
 }
 
@@ -22,36 +21,31 @@ std::vector<std::string> Map::split(const std::string& s, char delim) {
 
 std::shared_ptr<Map> Map::loadMap(const std::string& filePath) {
     sf::Vector2u startPosition;
-    sf::Vector2u endPosition;
     std::vector<std::vector<Map::Tile>> tiles;
 
     std::ifstream file(filePath);
-    std::string str;
+    std::string line;
 
     // parameters
-    std::getline(file, str);
-    std::vector<std::string> params = split(str, ';');
-    std::vector<std::string> startPositionParams = split(params.at(0), ',');
-    std::vector<std::string> endPositionParams = split(params.at(1), ',');
-
-    startPosition = sf::Vector2u(1 + std::stoul(startPositionParams.at(0)), 1 + std::stoul(startPositionParams.at(1)));
-    endPosition = sf::Vector2u(1 + std::stoul(endPositionParams.at(0)), 1 + std::stoul(endPositionParams.at(1)));
+    std::getline(file, line);
+    std::vector<std::string> startPositionParams = split(line, ',');
+    startPosition = sf::Vector2u(std::stoul(startPositionParams.at(0)) + 1, std::stoul(startPositionParams.at(1)) + 2);
 
     // map
     tiles.push_back(std::vector<Map::Tile>());
 
     unsigned int maxLineLength = 0;
     unsigned int y = 0;
-    while (std::getline(file, str))
+    while (std::getline(file, line))
     {
         unsigned int x = 0;
         std::vector<Map::Tile> row;
 
-        if (maxLineLength < str.length())
-            maxLineLength = str.length();
+        if (maxLineLength < line.length())
+            maxLineLength = line.length();
 
         row.push_back(Map::Tile::air);
-        for (char& c : str)
+        for (char& c : line)
         {
             if (c == 'X') 
                 row.push_back(Map::Tile::bush);
@@ -76,7 +70,7 @@ std::shared_ptr<Map> Map::loadMap(const std::string& filePath) {
         }
     }
 
-    return std::shared_ptr<Map>(new Map(startPosition, endPosition, tiles));
+    return std::shared_ptr<Map>(new Map(startPosition, tiles));
 }
 
 bool Map::isWalkable(Tile tile)
@@ -97,14 +91,4 @@ unsigned int Map::getStartX()
 unsigned int Map::getStartZ() 
 {
     return startPosition.y;
-}
-
-unsigned int Map::getEndX() 
-{
-    return endPosition.x;
-}
-
-unsigned int Map::getEndZ() 
-{
-    return endPosition.y;
 }
