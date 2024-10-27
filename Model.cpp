@@ -7,6 +7,8 @@
 
 Model::Model(const std::string& dirPath, const std::string& fileNameWithoutExtension)
 {
+	vertices = std::shared_ptr<std::vector<float>>(new std::vector<float>());
+
 	// read vertices
 	std::string inputFileWithoutExtension = dirPath + "/" + fileNameWithoutExtension;
 
@@ -64,6 +66,11 @@ Model::Model(const std::string& dirPath, const std::string& fileNameWithoutExten
 		{
 			size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
 
+			tinyobj::index_t idx0 = shapes[s].mesh.indices[index_offset];
+			tinyobj::real_t nx = attrib.normals[3 * size_t(idx0.normal_index) + 0];
+			tinyobj::real_t ny = attrib.normals[3 * size_t(idx0.normal_index) + 1];
+			tinyobj::real_t nz = attrib.normals[3 * size_t(idx0.normal_index) + 2];
+
 			// Loop over vertices in the face.
 			for (size_t v = 0; v < fv; v++)
 			{
@@ -72,6 +79,11 @@ Model::Model(const std::string& dirPath, const std::string& fileNameWithoutExten
 				tinyobj::real_t vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
 				tinyobj::real_t vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
 				tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
+
+				tinyobj::real_t tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
+				sf::Vector3f color = colorMap[tx];
+
+				vertices->insert(vertices->end(), { vx, vy, vz, color.x, color.y, color.z, nx, ny, nz });
 
 				if (vx < xMin)
 					xMin = vx;
@@ -102,4 +114,19 @@ void Model::setOffset(float x, float y, float z)
 	xOffset = x;
 	yOffset = y;
 	zOffset = z;
+}
+
+void Model::setVBOOffset(GLuint VBOOffset)
+{
+	this->VBOOffset = VBOOffset;
+}
+
+std::shared_ptr<std::vector<float>> Model::getVertices()
+{
+	return vertices;
+}
+
+unsigned long long Model::getVerticesSize()
+{
+	return vertices->size();
 }

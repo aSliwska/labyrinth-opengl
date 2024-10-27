@@ -16,10 +16,15 @@ protected:
 	std::unique_ptr<ModelRepository> modelRepo;
 	std::shared_ptr<Map> map;
 	std::unique_ptr<InputHandler> inputHandler;
+	glm::mat4 orthogonalProjection;
+	std::vector<float> mergedVertices;
+	sf::Shader shader;
+	GLuint vaoVertexSize;
 
 	void initOpenGL();
+	void loadShaders();
 	void reshapeScreen(const sf::Vector2u& size);
-	void drawModel(const std::unique_ptr<Model>& model, float x, float y, float z);
+	void drawModel(const std::unique_ptr<Model>& model, float x, float y, float z, glm::mat4 modelTransform, const glm::mat4& orthogonalViewTransform);
 	void drawScene();
 	bool checkWinCondition();
 
