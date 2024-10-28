@@ -3,7 +3,7 @@
 
 Game::Game()
 {
-    float walkSpeed = 1.5f;
+    float walkSpeed = 0.009f;
     camera = std::shared_ptr<LockedSpherical>(new LockedSpherical(12.0f, 0.785398f, 0.7f));
     playerRotation = std::shared_ptr<UnlockedSpherical>(new UnlockedSpherical(1.0f, 0.9f, 0.0f));
     tileSize = 1.6;

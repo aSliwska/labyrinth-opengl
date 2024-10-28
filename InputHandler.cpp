@@ -40,14 +40,14 @@ void InputHandler::handleUserInput(const sf::Time& timeElapsed)
 
         if (forward != 0) 
         {
-            distanceWalkedX -= (camera->getX() / camera->getDistance()) * forward * curWalkSpeed / time;
-            distanceWalkedZ -= (camera->getZ() / camera->getDistance()) * forward * curWalkSpeed / time;
+            distanceWalkedX -= (camera->getX() / camera->getDistance()) * forward * curWalkSpeed * time;
+            distanceWalkedZ -= (camera->getZ() / camera->getDistance()) * forward * curWalkSpeed * time;
         }
 
         if (right != 0)
         {
-            distanceWalkedX -= (camera->getZ() / camera->getDistance()) * right * curWalkSpeed / time;
-            distanceWalkedZ -= (-camera->getX() / camera->getDistance()) * right * curWalkSpeed / time;
+            distanceWalkedX -= (camera->getZ() / camera->getDistance()) * right * curWalkSpeed * time;
+            distanceWalkedZ -= (-camera->getX() / camera->getDistance()) * right * curWalkSpeed * time;
         }
 
         int oldMapCoordX = std::floor(playerPosition->x / tileSize);
